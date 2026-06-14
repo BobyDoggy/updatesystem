@@ -143,12 +143,15 @@ public class WinDevUpdaterStrategy implements UpdaterStrategy {
     }
 
     private void extractZip(Path zipFile, Path targetDir) throws IOException {
+        // toAbsolutePath() avant normalize() pour que startsWith() fonctionne
+        // même si targetDir est un chemin relatif (ex: .\fake-install)
+        Path absoluteTarget = targetDir.toAbsolutePath().normalize();
         try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipFile))) {
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
-                Path entryPath = targetDir.resolve(entry.getName()).normalize();
+                Path entryPath = absoluteTarget.resolve(entry.getName()).normalize();
                 // protection zip slip : un chemin traversant hors de targetDir est rejeté
-                if (!entryPath.startsWith(targetDir)) {
+                if (!entryPath.startsWith(absoluteTarget)) {
                     throw new IOException("Entrée ZIP suspecte (path traversal) : " + entry.getName());
                 }
                 if (entry.isDirectory()) {

@@ -1,0 +1,14 @@
+updater:
+  channel: stable
+  check-interval-minutes: 60
+  auto-install: false
+
+  source:
+    type: http
+    manifest-url: http://localhost:8080/manifest.json
+
+  target:
+    type: windev
+    install-dir: ./fake-install
+    process-name: MonAppli.exe
+    current-version: 1.0.0
