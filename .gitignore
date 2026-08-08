@@ -30,8 +30,9 @@ Thumbs.db
 *.log
 
 # Fichiers de config locaux (contiennent des URLs/chemins spécifiques à chaque poste)
-self-updater/src/main/resources/self-updater-config.yml
-system-updater/src/main/resources/update-config.yml
+# — voir les *.sample.yml versionnés à côté, qui servent de modèle
+self-updater/self-updater-config.yml
+system-updater/update-config.yml
 
 # Environnement de test — fichiers générés par setup-test.py
 test-env/artifacts/

@@ -1,0 +1,20 @@
+# Fichier d'exemple — copier vers "self-updater-config.yml" (dans le même
+# dossier ou ailleurs) et adapter les valeurs à la machine cible. Le fichier
+# copié est ignoré par git (voir .gitignore) car son contenu est spécifique
+# à chaque poste.
+#
+# Utilisation :
+#   java -jar self-updater.jar chemin/vers/self-updater-config.yml
+
+self-updater:
+  channel: stable
+
+  source:
+    type: http
+    manifest-url: https://updates.exemple.com/manifest.json
+
+  system-updater:
+    jar-path: C:\Apps\updater\system-updater.jar
+    version-file: C:\Apps\updater\system-updater-version.txt
+    config-path: C:\Apps\updater\update-config.yml
+    java-executable: java

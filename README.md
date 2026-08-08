@@ -87,6 +87,12 @@ Produit deux fat JARs autonomes :
 
 ## Configuration
 
+Les fichiers de config réels contiennent des chemins/URLs propres à chaque poste et ne sont donc **pas versionnés** (voir `.gitignore`). Deux fichiers d'exemple sont fournis comme point de départ :
+- `system-updater/update-config.sample.yml`
+- `self-updater/self-updater-config.sample.yml`
+
+Copier le sample vers son nom sans `.sample` (même dossier ou ailleurs) et adapter les valeurs.
+
 ### System-Updater — `update-config.yml`
 
 ```yaml
@@ -216,6 +222,14 @@ java -jar ..\system-updater\target\system-updater-1.0.0-SNAPSHOT.jar update-conf
 
 **Résultat attendu :** les fichiers de `fake-install/` passent en v1.0.1.  
 Relancer une seconde fois → "Déjà à jour", aucune action effectuée.
+
+**4. Lancer le Self-Updater** *(terminal 2, depuis `test-env/`)*
+
+```bash
+java -jar ..\self-updater\target\self-updater-1.0.0-SNAPSHOT.jar self-updater-config-test.yml
+```
+
+**Résultat attendu :** `system-updater-version.txt` passe de `1.0.0` à `1.0.1`, et `system-updater-runtime.jar` est créé/remplacé dans `test-env/`. Le lancement du System-Updater qui suit échouera (le JAR de test généré par `setup-test.py` est un JAR factice sans code réel) — c'est attendu, seul le mécanisme de remplacement est testé ici.
 
 ---
 

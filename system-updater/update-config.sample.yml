@@ -1,0 +1,21 @@
+# Fichier d'exemple — copier vers "update-config.yml" (dans le même dossier ou
+# ailleurs) et adapter les valeurs à la machine cible. Le fichier copié est
+# ignoré par git (voir .gitignore) car son contenu est spécifique à chaque poste.
+#
+# Utilisation :
+#   java -jar system-updater.jar chemin/vers/update-config.yml
+
+updater:
+  channel: stable                   # stable | beta | ...
+  check-interval-minutes: 60
+  auto-install: false
+
+  source:
+    type: http                      # http | ldap (à venir)
+    manifest-url: https://updates.exemple.com/manifest.json
+
+  target:
+    type: windev                    # windev | service (à venir)
+    install-dir: C:\Apps\MonAppli
+    process-name: MonAppli.exe
+    current-version: 1.0.0

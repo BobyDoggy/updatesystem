@@ -1,0 +1,12 @@
+self-updater:
+  channel: stable
+
+  source:
+    type: http
+    manifest-url: http://localhost:8080/manifest.json
+
+  system-updater:
+    jar-path: ./system-updater-runtime.jar
+    version-file: ./system-updater-version.txt
+    config-path: ./update-config-test.yml
+    java-executable: java
