@@ -1,0 +1,7 @@
+# Le wrapper Maven doit garder des fins de ligne LF : le script est exécuté
+# tel quel sur le VPS (Linux) et un shebang suivi de CRLF n'y fonctionne pas.
+mvnw text eol=lf
+*.sh text eol=lf
+
+# Script Windows : CRLF natif, sans incidence sur le VPS qui ne l'exécute pas.
+mvnw.cmd text eol=crlf
