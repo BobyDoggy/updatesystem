@@ -7,6 +7,10 @@ pom.xml.next
 release.properties
 dependency-reduced-pom.xml
 
+# Maven Wrapper — téléchargé automatiquement par mvnw/mvnw.cmd au premier
+# lancement (voir .mvn/wrapper/maven-wrapper.properties, versionné)
+.mvn/wrapper/maven-wrapper.jar
+
 # IDE — IntelliJ IDEA
 .idea/
 *.iml
