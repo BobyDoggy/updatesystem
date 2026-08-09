@@ -1,0 +1,35 @@
+# nginx-updates — sert [rep_sftp_updates] (manifest + artefacts) en HTTP(S)
+# aux clients System-Updater / Self-Updater.
+#
+# Prérequis sur le VPS (déjà en place, voir vps-setup.md et
+# .claude/notes/securisation-vps_09082026.md §10) :
+#   - [rep_sftp_updates]  : racine chrootée SFTP de l'utilisateur `****`
+#   - /var/log/nginx-updates/ : dossier de logs persistant hors conteneur
+#     (sudo mkdir -p /var/log/nginx-updates)
+#
+# Déploiement :
+#   sudo docker compose -f docker-compose.yml up -d
+#
+# Note sécurité : `ufw-docker` est déjà installé sur ce VPS (mis en place pour
+# HFSQL) et patche globalement la chaîne DOCKER-USER — donc CE conteneur a
+# lui aussi besoin de ses propres règles UFW explicites, sinon son port publié
+# reste injoignable de l'extérieur (constaté en pratique : timeout tant que
+# les règles ci-dessous n'étaient pas ajoutées). Voir vps-setup.md Étape 1 :
+#   sudo ufw allow 80/tcp
+#   sudo ufw-docker allow nginx-updates 80
+#   sudo ufw reload
+# Toute restriction d'accès plus fine doit être faite dans la conf nginx
+# elle-même (allow/deny, limit_req), pas via UFW.
+
+services:
+  nginx-updates:
+    image: nginx:alpine
+    container_name: nginx-updates
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      # - "443:443"   # à activer une fois le certificat HTTPS en place
+    volumes:
+      - /srv/updates/files:/usr/share/nginx/html:ro
+      - ./nginx-updates.conf:/etc/nginx/conf.d/default.conf:ro
+      - /var/log/nginx-updates:/var/log/nginx
