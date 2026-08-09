@@ -51,3 +51,7 @@ test-env/fake-install/
 test-env/fake-install-backup-*/
 test-env/manifest.json
 test-env/system-updater-version.txt
+
+
+# perso
+.claude/notes/*
