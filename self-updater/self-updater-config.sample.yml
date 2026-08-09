@@ -17,4 +17,11 @@ self-updater:
     jar-path: C:\Apps\updater\system-updater.jar
     version-file: C:\Apps\updater\system-updater-version.txt
     config-path: C:\Apps\updater\update-config.yml
-    java-executable: java
+    # Si le poste cible n'a pas de Java installé/dans le PATH, utiliser le
+    # JVM Wrapper (jvmw.cmd à la racine du projet) pour lancer CE
+    # self-updater.jar : il provisionne un JRE 21 local avant de démarrer.
+    # Une fois provisionné, pointer ici directement vers le java.exe local
+    # (ProcessBuilder n'exécute pas les scripts .cmd de façon fiable) :
+    java-executable: C:\Apps\updater\.jvm\current\bin\java.exe
+    # Sinon, si Java est déjà installé et dans le PATH sur ce poste :
+    # java-executable: java

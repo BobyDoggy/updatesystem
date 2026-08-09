@@ -45,11 +45,19 @@ fetch manifest  →  comparaison de versions
 
 ## Prérequis
 
+### Pour builder le projet (dev/CI)
+
 | Outil | Version minimale |
 |---|---|
 | Java (JDK) | 21 LTS |
 | Maven | 3.8+ |
 | Python *(tests uniquement)* | 3.x |
+
+`mvnw`/`mvnw.cmd` (Maven Wrapper) sont fournis pour ne pas dépendre d'une installation Maven locale.
+
+### Sur le poste client (exécution)
+
+**Aucun prérequis** : `jvmw.cmd` (JVM Wrapper, voir plus bas) provisionne automatiquement un JRE 21 au premier lancement. Un `java` déjà installé et dans le PATH reste utilisable si préféré (voir `self-updater-config.sample.yml`).
 
 ---
 
@@ -66,6 +74,8 @@ update-system/
 │   └── config/              Lecture de update-config.yml
 ├── self-updater/            Module autonome et minimaliste
 │   └── ...                  Vérifie / remplace le System-Updater, puis le lance
+├── jvmw.cmd + .jvm/wrapper/  JVM Wrapper — provisionne un JRE 21 côté client
+├── mvnw(.cmd) + .mvn/        Maven Wrapper — provisionne Maven côté dev/CI
 └── test-env/                Environnement de test local (serveur HTTP Python)
     ├── setup-test.py        Génère les artefacts et le manifest de test
     └── update-config-test.yml
@@ -175,15 +185,45 @@ java -jar self-updater.jar [chemin/vers/self-updater-config.yml]
 
 Le Self-Updater met à jour le System-Updater si nécessaire, puis le lance automatiquement.
 
+### Sans Java pré-installé sur le poste client — via le JVM Wrapper
+
+```bash
+jvmw.cmd -jar self-updater.jar C:\Apps\updater\self-updater-config.yml
+```
+
+`jvmw.cmd` télécharge et vérifie (SHA-256) un JRE 21 Temurin au premier lancement dans `.jvm\current\`, puis délègue à `java.exe`. Voir [JVM Wrapper](#jvm-wrapper) plus bas.
+
 ### Planification Windows (recommandé)
 
 Créer une tâche planifiée Windows qui exécute le Self-Updater à l'intervalle souhaité :
 
 ```
-Programme : java
+Programme : C:\Apps\updater\jvmw.cmd
 Arguments : -jar C:\Apps\updater\self-updater.jar C:\Apps\updater\self-updater-config.yml
 Déclencheur : toutes les 60 minutes (ou au démarrage de session)
 ```
+
+Le Task Scheduler Windows exécute nativement les scripts `.cmd` comme programme — aucune installation Java préalable sur le poste n'est donc requise. Si un `java` est déjà présent et dans le PATH, `Programme : java` reste utilisable directement.
+
+---
+
+## JVM Wrapper
+
+Comme le Maven Wrapper (`mvnw`/`mvnw.cmd`) évite de dépendre d'une installation Maven locale côté dev/CI, le **JVM Wrapper** (`jvmw.cmd`) évite de dépendre d'une installation Java locale côté **poste client**.
+
+Fonctionnement, au premier lancement :
+1. Lit `.jvm\wrapper\jvm-wrapper.properties` (`distributionUrl`, `distributionSha256Sum`) — fichier versionné, sur le modèle de `.mvn\wrapper\maven-wrapper.properties`.
+2. Télécharge le JRE 21 (Eclipse Temurin, build Windows x64) et vérifie son checksum SHA-256.
+3. L'extrait dans `.jvm\current\` (non versionné, voir `.gitignore`).
+4. Délègue l'exécution à `.jvm\current\bin\java.exe %*`.
+
+Les lancements suivants réutilisent directement le runtime déjà provisionné, sans aucun accès réseau.
+
+**Distribuer `jvmw.cmd` + `.jvm\wrapper\jvm-wrapper.properties`** avec le reste de l'installation cliente (dossier `C:\Apps\updater\`) suffit : le poste n'a besoin d'aucun prérequis Java.
+
+**Chaînage avec le Self-Updater** : une fois `jvmw.cmd` exécuté (donc le JRE provisionné), configurer `java-executable` dans `self-updater-config.yml` pour pointer directement sur `.jvm\current\bin\java.exe` plutôt que sur `jvmw.cmd` — `ProcessBuilder` (utilisé par le Self-Updater pour lancer le System-Updater) n'exécute pas les scripts `.cmd` de façon fiable sur Windows, contrairement à un `.exe` réel. Voir `self-updater-config.sample.yml`.
+
+**Mettre à jour la version du JRE** : régénérer `distributionUrl`/`distributionSha256Sum` depuis l'[API Adoptium](https://api.adoptium.net/v3/assets/latest/21/hotspot?os=windows&architecture=x64&image_type=jre&vendor=eclipse) (champs `package.link` et `package.checksum`), puis supprimer `.jvm\current\` sur les postes déjà provisionnés pour forcer le re-téléchargement.
 
 ---
 
@@ -249,5 +289,6 @@ java -jar ..\self-updater\target\self-updater-1.0.0-SNAPSHOT.jar self-updater-co
 | HttpVersionSource | ✅ Disponible |
 | WinDevUpdaterStrategy (xcopy) | ✅ Disponible |
 | SelfUpdater | ✅ Disponible |
+| JVM Wrapper (JRE 21 auto-provisionné côté client) | ✅ Disponible |
 | ServiceUpdaterStrategy (PowerShell + .NET) | En cours |
 | LdapVersionSource | Prévu |

@@ -11,6 +11,13 @@ dependency-reduced-pom.xml
 # lancement (voir .mvn/wrapper/maven-wrapper.properties, versionné)
 .mvn/wrapper/maven-wrapper.jar
 
+# JVM Wrapper — JRE téléchargé et extrait automatiquement par jvmw.cmd au
+# premier lancement sur le poste cible (voir .jvm/wrapper/jvm-wrapper.properties,
+# versionné)
+.jvm/current/
+.jvm/wrapper/jre-download.zip
+.jvm/_extract/
+
 # IDE — IntelliJ IDEA
 .idea/
 *.iml
